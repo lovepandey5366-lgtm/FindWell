@@ -179,6 +179,19 @@
       const initialType = (urlParams.get('type') || 'LOST').toUpperCase();
       setType(initialType);
 
+      // Populate locations dynamically from database
+      try {
+        const locData = await API.locations.list();
+        if (locData.locations && locData.locations.length > 0) {
+          const select = document.getElementById('location_select');
+          select.innerHTML = '<option value="" disabled selected>Select campus location...</option>' +
+            locData.locations.map(l => `<option value="${escapeHTML(l.name)}">${escapeHTML(l.name)}</option>`).join('') +
+            '<option value="Other">Other / Specific Area</option>';
+        }
+      } catch (e) {
+        // Fall back to default static options
+      }
+
       // Type toggles
       document.getElementById('btn-type-lost').addEventListener('click', () => setType('LOST'));
       document.getElementById('btn-type-found').addEventListener('click', () => setType('FOUND'));

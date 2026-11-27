@@ -29,6 +29,14 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS locations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    description TEXT,
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -63,6 +71,7 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+  CREATE INDEX IF NOT EXISTS idx_locations_name ON locations(name);
   CREATE INDEX IF NOT EXISTS idx_items_type_status ON items(type, status);
   CREATE INDEX IF NOT EXISTS idx_items_category ON items(category);
   CREATE INDEX IF NOT EXISTS idx_items_location ON items(location);
@@ -72,8 +81,41 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
 `);
 
-// Auto-seed if database has no users
+// Auto-seed locations if table is empty
+function seedLocations() {
+  const locCount = db.prepare('SELECT COUNT(*) as count FROM locations').get();
+  if (locCount && locCount.count > 0) {
+    return;
+  }
+
+  console.log('[Database] Seeding default campus locations...');
+  const insertLoc = db.prepare('INSERT INTO locations (name, description, is_active) VALUES (?, ?, 1)');
+  const defaultLocations = [
+    ['Library', 'Central Library, Reference Sections & Reading Rooms'],
+    ['Canteen', 'Campus Main Canteen & Food Court Area'],
+    ['Hostel', 'Student Hostel Blocks & Common Lounges'],
+    ['Labs', 'Computer Science, Engineering & Research Labs'],
+    ['Classroom Block', 'Academic Lecture Theatres & Classrooms'],
+    ['Main Gate', 'Campus Entrance Gate & Security Checkpoint'],
+    ['Ground', 'Athletic Sports Ground, Gym & Pavilion'],
+    ['Parking', 'Vehicular Parking Lots (Two-Wheeler & Four-Wheeler)'],
+    ['Auditorium', 'Main University Convention Auditorium'],
+    ['Admin Block', 'Administrative Office & Dean Complex']
+  ];
+
+  for (const [name, desc] of defaultLocations) {
+    try {
+      insertLoc.run(name, desc);
+    } catch (e) {
+      // Ignore if exists
+    }
+  }
+}
+
+// Auto-seed users & sample items if database has no users
 function seedDatabase() {
+  seedLocations();
+
   const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
   if (userCount && userCount.count > 0) {
     return;
@@ -205,7 +247,7 @@ function seedDatabase() {
   insertNotif.run(u3Id, "New Claim Received: Alex Rivera submitted a verification claim for your reported wallet.", `/item.html?id=${item3Id}`, 0);
   insertNotif.run(adminId, "System Alert: Welcome to Campus Lost & Found Administration Dashboard.", "/admin.html", 0);
 
-  console.log('[Database] Database successfully seeded with demo users, items, claims, and notifications.');
+  console.log('[Database] Database successfully seeded with demo users, locations, items, claims, and notifications.');
 }
 
 // Run seed immediately

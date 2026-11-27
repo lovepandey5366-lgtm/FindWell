@@ -44,6 +44,11 @@ const API = {
     me: () => API.request('/api/auth/me', { method: 'GET' })
   },
 
+  // Locations (public)
+  locations: {
+    list: () => API.request('/api/locations', { method: 'GET' })
+  },
+
   // Items endpoints
   items: {
     list: (params = {}) => {
@@ -83,10 +88,22 @@ const API = {
     markAllRead: () => API.request('/api/notifications/read-all', { method: 'PUT' })
   },
 
-  // Admin endpoints
+  // Admin endpoints (full control over items, claims, users/members, and locations)
   admin: {
     stats: () => API.request('/api/admin/stats', { method: 'GET' }),
     items: () => API.request('/api/admin/items', { method: 'GET' }),
-    claims: () => API.request('/api/admin/claims', { method: 'GET' })
+    claims: () => API.request('/api/admin/claims', { method: 'GET' }),
+
+    // Members Management
+    users: () => API.request('/api/admin/users', { method: 'GET' }),
+    getUser: (id) => API.request(`/api/admin/users/${id}`, { method: 'GET' }),
+    updateUser: (id, data) => API.request(`/api/admin/users/${id}`, { method: 'PUT', body: data }),
+    deleteUser: (id) => API.request(`/api/admin/users/${id}`, { method: 'DELETE' }),
+
+    // Locations Management
+    locations: () => API.request('/api/admin/locations', { method: 'GET' }),
+    createLocation: (data) => API.request('/api/admin/locations', { method: 'POST', body: data }),
+    updateLocation: (id, data) => API.request(`/api/admin/locations/${id}`, { method: 'PUT', body: data }),
+    deleteLocation: (id) => API.request(`/api/admin/locations/${id}`, { method: 'DELETE' })
   }
 };

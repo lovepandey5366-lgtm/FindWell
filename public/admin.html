@@ -19,131 +19,408 @@
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
           <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-danger px-2 py-1"><i class="bi bi-shield-lock-fill me-1"></i>ADMIN ONLY</span>
+            <span class="badge bg-danger px-2 py-1"><i class="bi bi-shield-lock-fill me-1"></i>ADMIN CONSOLE</span>
             <h2 class="fw-bold mb-0">Campus Administration Portal</h2>
           </div>
-          <p class="text-muted small mb-0 mt-1">Manage all campus reports, claims verification, and recovery analytics</p>
+          <p class="text-muted small mb-0 mt-1">Full control over campus members, physical locations, reported items, and claims</p>
         </div>
         <div>
           <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="loadAllAdminData()">
-            <i class="bi bi-arrow-clockwise me-1"></i>Refresh Data
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh All Data
           </button>
         </div>
       </div>
 
-      <!-- Stats Metrics Cards -->
-      <div class="row g-3 mb-4">
-        <div class="col-6 col-lg-2">
-          <div class="stat-card stat-lost">
-            <div class="stat-value text-danger" id="admin-stat-lost">-</div>
-            <div class="stat-label">Total Lost</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-2">
-          <div class="stat-card stat-found">
-            <div class="stat-value text-success" id="admin-stat-found">-</div>
-            <div class="stat-label">Total Found</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-2">
-          <div class="stat-card stat-returned">
-            <div class="stat-value" style="color: #6366f1;" id="admin-stat-returned">-</div>
-            <div class="stat-label">Returned</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-2">
-          <div class="stat-card stat-rate">
-            <div class="stat-value text-warning" id="admin-stat-rate">-%</div>
-            <div class="stat-label">Recovery Rate</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-2">
-          <div class="stat-card">
-            <div class="stat-value text-primary" id="admin-stat-pending-claims">-</div>
-            <div class="stat-label">Pending Claims</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-2">
-          <div class="stat-card" style="border-left-color: #64748b;">
-            <div class="stat-value text-secondary" id="admin-stat-users">-</div>
-            <div class="stat-label">Total Users</div>
-          </div>
-        </div>
-      </div>
+      <!-- Navigation Tabs -->
+      <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm border" id="admin-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active fw-semibold py-2 px-3" id="tab-overview-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-overview" type="button" role="tab">
+            <i class="bi bi-speedometer2 me-1"></i>Overview & Stats
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold py-2 px-3" id="tab-members-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-members" type="button" role="tab">
+            <i class="bi bi-people-fill me-1"></i>Campus Members (<span id="members-nav-count">0</span>)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold py-2 px-3" id="tab-locations-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-locations" type="button" role="tab">
+            <i class="bi bi-geo-alt-fill me-1"></i>Campus Locations (<span id="locations-nav-count">0</span>)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold py-2 px-3" id="tab-items-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-items" type="button" role="tab">
+            <i class="bi bi-box-seam me-1"></i>All Items Directory
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold py-2 px-3" id="tab-claims-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-claims" type="button" role="tab">
+            <i class="bi bi-hourglass-split me-1"></i>Claims Queue (<span id="claims-nav-count">0</span>)
+          </button>
+        </li>
+      </ul>
 
-      <!-- Section: Pending Claims Requiring Verification -->
-      <div class="card shadow-sm border-0 rounded-4 mb-4">
-        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-          <h5 class="fw-bold mb-0 text-dark">
-            <i class="bi bi-hourglass-top text-warning me-2"></i>Campus Claims Queue
-          </h5>
-          <span class="badge bg-warning text-dark px-3 py-2 rounded-pill small" id="pending-claims-badge">0 Pending</span>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Item Under Claim</th>
-                  <th>Claimant Name</th>
-                  <th>Claimant Contact</th>
-                  <th>Reported By</th>
-                  <th>Proof Message</th>
-                  <th>Status</th>
-                  <th class="text-end">Verification Action</th>
-                </tr>
-              </thead>
-              <tbody id="admin-claims-tbody">
-                <tr>
-                  <td colspan="7" class="text-center py-4 text-muted">
-                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading claims queue...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- Tabs Content -->
+      <div class="tab-content" id="admin-tabs-content">
+        
+        <!-- ============================================== -->
+        <!-- TAB 1: OVERVIEW & STATS -->
+        <!-- ============================================== -->
+        <div class="tab-pane fade show active" id="admin-tab-overview" role="tabpanel">
+          <!-- Stats Metrics Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-2">
+              <div class="stat-card stat-lost">
+                <div class="stat-value text-danger" id="admin-stat-lost">-</div>
+                <div class="stat-label">Total Lost</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-2">
+              <div class="stat-card stat-found">
+                <div class="stat-value text-success" id="admin-stat-found">-</div>
+                <div class="stat-label">Total Found</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-2">
+              <div class="stat-card stat-returned">
+                <div class="stat-value" style="color: #6366f1;" id="admin-stat-returned">-</div>
+                <div class="stat-label">Returned</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-2">
+              <div class="stat-card stat-rate">
+                <div class="stat-value text-warning" id="admin-stat-rate">-%</div>
+                <div class="stat-label">Recovery Rate</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-2">
+              <div class="stat-card" style="border-left-color: #0284c7;">
+                <div class="stat-value text-info" id="admin-stat-users">-</div>
+                <div class="stat-label">Members</div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-2">
+              <div class="stat-card" style="border-left-color: #10b981;">
+                <div class="stat-value text-success" id="admin-stat-locations">-</div>
+                <div class="stat-label">Locations</div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Section: All Campus Items Management -->
-      <div class="card shadow-sm border-0 rounded-4 mb-4">
-        <div class="card-header bg-white border-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
-          <h5 class="fw-bold mb-0 text-dark">
-            <i class="bi bi-list-task text-primary me-2"></i>All Campus Reports Directory
-          </h5>
-          <div class="d-flex gap-2">
-            <input type="text" id="admin-items-search" class="form-control form-control-sm" placeholder="Filter table..." style="width: 220px;">
+          <!-- Recent Activity & Quick Cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+              <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-activity text-primary me-2"></i>Recent Campus Activity</h5>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Item</th>
+                          <th>Type</th>
+                          <th>Location</th>
+                          <th>Reporter</th>
+                          <th>Status</th>
+                          <th>Reported</th>
+                        </tr>
+                      </thead>
+                      <tbody id="overview-recent-tbody">
+                        <tr><td colspan="6" class="text-center py-4 text-muted">Loading activity...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-3">
+                  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-pie-chart text-success me-2"></i>Items by Category</h5>
+                </div>
+                <div class="card-body p-3">
+                  <div id="overview-category-list" class="d-flex flex-column gap-2">
+                    <div class="text-muted small text-center py-4">Loading categories...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Item Title</th>
-                  <th>Type</th>
-                  <th>Category</th>
-                  <th>Campus Location</th>
-                  <th>Reporter</th>
-                  <th>Claims</th>
-                  <th>Status</th>
-                  <th class="text-end">Manage Status / Delete</th>
-                </tr>
-              </thead>
-              <tbody id="admin-items-tbody">
-                <tr>
-                  <td colspan="8" class="text-center py-4 text-muted">
-                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading items list...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: CAMPUS MEMBERS MANAGEMENT -->
+        <!-- ============================================== -->
+        <div class="tab-pane fade" id="admin-tab-members" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">
+                  <i class="bi bi-people-fill text-primary me-2"></i>Campus Member Directory & Details
+                </h5>
+                <p class="text-muted small mb-0">View, edit profiles, toggle administrator privileges, and reset credentials</p>
+              </div>
+              <div class="d-flex gap-2">
+                <input type="text" id="member-search-input" class="form-control form-control-sm" placeholder="Filter members..." style="width: 220px;">
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Role Type</th>
+                      <th>Admin Rights</th>
+                      <th>Reports</th>
+                      <th>Claims</th>
+                      <th>Joined</th>
+                      <th class="text-end">Manage Member</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-members-tbody">
+                    <tr><td colspan="9" class="text-center py-4 text-muted">Loading members list...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 3: CAMPUS LOCATIONS MANAGEMENT -->
+        <!-- ============================================== -->
+        <div class="tab-pane fade" id="admin-tab-locations" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">
+                  <i class="bi bi-geo-alt-fill text-success me-2"></i>Campus Locations Configuration
+                </h5>
+                <p class="text-muted small mb-0">Configure standard campus hubs, buildings, and designated drop-off spots</p>
+              </div>
+              <div>
+                <button type="button" class="btn btn-primary btn-sm fw-semibold" id="open-add-location-modal">
+                  <i class="bi bi-plus-circle me-1"></i>Add New Location
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Location Name</th>
+                      <th>Description</th>
+                      <th>Active Status</th>
+                      <th>Items Associated</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-locations-tbody">
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Loading campus locations...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 4: ALL ITEMS DIRECTORY -->
+        <!-- ============================================== -->
+        <div class="tab-pane fade" id="admin-tab-items" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+              <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-list-task text-primary me-2"></i>All Campus Reports Directory
+              </h5>
+              <div class="d-flex gap-2">
+                <input type="text" id="admin-items-search" class="form-control form-control-sm" placeholder="Filter items..." style="width: 220px;">
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Item Title</th>
+                      <th>Type</th>
+                      <th>Category</th>
+                      <th>Campus Location</th>
+                      <th>Reporter</th>
+                      <th>Claims</th>
+                      <th>Status</th>
+                      <th class="text-end">Manage Status / Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-items-tbody">
+                    <tr><td colspan="8" class="text-center py-4 text-muted">Loading items list...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 5: CLAIMS QUEUE -->
+        <!-- ============================================== -->
+        <div class="tab-pane fade" id="admin-tab-claims" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">
+                  <i class="bi bi-hourglass-top text-warning me-2"></i>Campus Claims Queue
+                </h5>
+                <p class="text-muted small mb-0">Verify proof messages and approve or reject ownership claims</p>
+              </div>
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill small" id="pending-claims-badge">0 Pending</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Item Under Claim</th>
+                      <th>Claimant Name</th>
+                      <th>Claimant Contact</th>
+                      <th>Reported By</th>
+                      <th>Proof Message</th>
+                      <th>Status</th>
+                      <th class="text-end">Verification Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-claims-tbody">
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Loading claims queue...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
   </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: EDIT MEMBER DETAILS -->
+  <!-- ============================================== -->
+  <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="editMemberModalLabel">
+            <i class="bi bi-person-gear text-primary me-2"></i>Edit Member Details
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="edit-member-form">
+            <input type="hidden" id="edit-member-id">
+            
+            <div class="mb-3">
+              <label for="edit-member-name" class="form-label small fw-semibold">Full Name *</label>
+              <input type="text" class="form-control" id="edit-member-name" required minlength="2">
+            </div>
+
+            <div class="mb-3">
+              <label for="edit-member-email" class="form-label small fw-semibold">Campus Email Address *</label>
+              <input type="email" class="form-control" id="edit-member-email" required>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-member-phone" class="form-label small fw-semibold">Phone Number</label>
+                <input type="tel" class="form-control" id="edit-member-phone">
+              </div>
+              <div class="col-md-6">
+                <label for="edit-member-role" class="form-label small fw-semibold">Campus Role</label>
+                <select class="form-select" id="edit-member-role" required>
+                  <option value="student">Student</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3 form-check form-switch p-3 bg-light rounded-3 border">
+              <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="edit-member-admin">
+              <label class="form-check-label fw-semibold small text-dark" for="edit-member-admin">
+                Grant Administrator Privileges
+              </label>
+              <div class="form-text small">Admins have full moderation rights over all reports, claims, and users.</div>
+            </div>
+
+            <div class="mb-4">
+              <label for="edit-member-password" class="form-label small fw-semibold">Reset Password (Optional)</label>
+              <input type="text" class="form-control" id="edit-member-password" placeholder="Leave blank to keep current password">
+              <div class="form-text small">Enter at least 6 characters if you want to override their password.</div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold" id="save-member-btn">
+                Save Member Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: ADD / EDIT LOCATION -->
+  <!-- ============================================== -->
+  <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="locationModalLabel">
+            <i class="bi bi-geo-alt-fill text-success me-2"></i><span id="loc-modal-action-title">Add Campus Location</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="location-form">
+            <input type="hidden" id="loc-id">
+
+            <div class="mb-3">
+              <label for="loc-name" class="form-label small fw-semibold">Location Name *</label>
+              <input type="text" class="form-control" id="loc-name" placeholder="e.g. Auditorium, Sports Complex, Cafeteria" required minlength="2">
+            </div>
+
+            <div class="mb-3">
+              <label for="loc-desc" class="form-label small fw-semibold">Description / Landmark</label>
+              <textarea class="form-control" id="loc-desc" rows="3" placeholder="Brief details about the building, floor, or designated lost & found desk..."></textarea>
+            </div>
+
+            <div class="mb-4 form-check form-switch p-3 bg-light rounded-3 border" id="loc-active-group">
+              <input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="loc-is-active" checked>
+              <label class="form-check-label fw-semibold small text-dark" for="loc-is-active">
+                Active & Visible in Report Dropdowns
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-success px-4 fw-semibold" id="save-location-btn">
+                Save Location
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="footer-container"></div>
 
@@ -152,8 +429,13 @@
   <script src="/js/app.js"></script>
 
   <script>
+    let allMembersList = [];
+    let allLocationsList = [];
     let allItemsList = [];
     let allClaimsList = [];
+
+    let editMemberModalInstance = null;
+    let locationModalInstance = null;
 
     async function loadAllAdminData() {
       try {
@@ -171,86 +453,218 @@
         document.getElementById('admin-stat-found').textContent = s.totalFound;
         document.getElementById('admin-stat-returned').textContent = s.totalReturned;
         document.getElementById('admin-stat-rate').textContent = `${s.recoveryRate}%`;
-        document.getElementById('admin-stat-pending-claims').textContent = s.totalPendingClaims;
         document.getElementById('admin-stat-users').textContent = s.totalUsers;
+        document.getElementById('admin-stat-locations').textContent = s.totalLocations || 0;
 
-        // 2. Load Claims
-        const claimsData = await API.admin.claims();
-        allClaimsList = claimsData.claims || [];
-        renderAdminClaims(allClaimsList);
+        // Render Recent Activity on Overview
+        renderOverviewRecent(statsData.recentItems || []);
+        renderOverviewCategories(statsData.categoryStats || []);
 
-        // 3. Load Items
+        // 2. Load Members
+        const usersData = await API.admin.users();
+        allMembersList = usersData.users || [];
+        document.getElementById('members-nav-count').textContent = allMembersList.length;
+        renderAdminMembers(allMembersList);
+
+        // 3. Load Locations
+        const locData = await API.admin.locations();
+        allLocationsList = locData.locations || [];
+        document.getElementById('locations-nav-count').textContent = allLocationsList.length;
+        renderAdminLocations(allLocationsList);
+
+        // 4. Load Items
         const itemsData = await API.admin.items();
         allItemsList = itemsData.items || [];
         renderAdminItems(allItemsList);
+
+        // 5. Load Claims
+        const claimsData = await API.admin.claims();
+        allClaimsList = claimsData.claims || [];
+        const pendingCount = allClaimsList.filter(c => c.status === 'PENDING').length;
+        document.getElementById('claims-nav-count').textContent = pendingCount;
+        renderAdminClaims(allClaimsList);
 
       } catch (err) {
         showToast(err.message || 'Failed to load administrator data.', 'danger');
       }
     }
 
-    function renderAdminClaims(claims) {
-      const tbody = document.getElementById('admin-claims-tbody');
-      const pendingCount = claims.filter(c => c.status === 'PENDING').length;
-      document.getElementById('pending-claims-badge').textContent = `${pendingCount} Pending`;
+    // ==========================================
+    // RENDER: OVERVIEW
+    // ==========================================
+    function renderOverviewRecent(items) {
+      const tbody = document.getElementById('overview-recent-tbody');
+      if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No recent activity.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td><a href="/item.html?id=${item.id}" class="fw-bold text-dark text-decoration-none">${escapeHTML(item.title)}</a></td>
+          <td>${getTypeBadge(item.type)}</td>
+          <td><span class="small text-muted">${escapeHTML(item.location)}</span></td>
+          <td><span class="small fw-semibold">${escapeHTML(item.reporter_name)}</span></td>
+          <td>${getStatusBadge(item.status)}</td>
+          <td><span class="small text-muted">${formatDate(item.created_at)}</span></td>
+        </tr>
+      `).join('');
+    }
 
-      if (claims.length === 0) {
-        tbody.innerHTML = `
-          <tr><td colspan="7" class="text-center py-4 text-muted">No claims records found.</td></tr>
-        `;
+    function renderOverviewCategories(categories) {
+      const list = document.getElementById('overview-category-list');
+      if (categories.length === 0) {
+        list.innerHTML = '<div class="text-muted small text-center py-4">No data.</div>';
+        return;
+      }
+      list.innerHTML = categories.map(cat => `
+        <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light border">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi ${getCategoryIcon(cat.category)} text-primary"></i>
+            <span class="fw-medium small">${escapeHTML(cat.category)}</span>
+          </div>
+          <span class="badge bg-white text-dark border">${cat.count} items</span>
+        </div>
+      `).join('');
+    }
+
+    // ==========================================
+    // RENDER: MEMBERS
+    // ==========================================
+    function renderAdminMembers(members) {
+      const tbody = document.getElementById('admin-members-tbody');
+      if (members.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">No members found.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = claims.map(c => `
-        <tr class="${c.status === 'PENDING' ? 'table-warning table-opacity-10' : ''}">
+      tbody.innerHTML = members.map(m => `
+        <tr>
           <td>
-            <a href="/item.html?id=${c.item_id}" class="fw-bold text-dark text-decoration-none">
-              ${escapeHTML(c.item_title)}
-            </a>
-            <div class="small text-muted">${getTypeBadge(c.item_type)} &bull; ${escapeHTML(c.item_location)}</div>
+            <div class="fw-bold text-dark">${escapeHTML(m.name)}</div>
           </td>
+          <td><span class="small text-muted">${escapeHTML(m.email)}</span></td>
+          <td><span class="small text-muted">${m.phone ? escapeHTML(m.phone) : '—'}</span></td>
           <td>
-            <div class="fw-semibold">${escapeHTML(c.claimant_name)}</div>
-            <div class="small text-muted text-capitalize">${escapeHTML(c.claimant_role || 'User')}</div>
-          </td>
-          <td class="small">
-            <div><i class="bi bi-envelope me-1 text-primary"></i>${escapeHTML(c.claimant_email)}</div>
-            ${c.claimant_phone ? `<div><i class="bi bi-telephone me-1 text-success"></i>${escapeHTML(c.claimant_phone)}</div>` : ''}
+            <span class="badge bg-light text-dark border text-capitalize">${escapeHTML(m.role_type)}</span>
           </td>
           <td>
-            <div class="small fw-semibold">${escapeHTML(c.owner_name)}</div>
-            <div class="small text-muted">${escapeHTML(c.owner_email)}</div>
+            ${m.is_admin ? '<span class="badge bg-danger"><i class="bi bi-shield-check me-1"></i>Admin</span>' : '<span class="badge bg-secondary-subtle text-secondary">Member</span>'}
           </td>
-          <td>
-            <div class="small text-secondary p-2 bg-light rounded border" style="max-width: 250px;">
-              "${escapeHTML(c.proof_message)}"
-            </div>
-          </td>
-          <td>
-            ${c.status === 'PENDING' ? '<span class="badge bg-warning text-dark">Pending</span>' :
-              c.status === 'APPROVED' ? '<span class="badge bg-success">Approved</span>' :
-              '<span class="badge bg-secondary">Rejected</span>'}
-          </td>
+          <td><span class="badge bg-light text-primary border">${m.items_count || 0}</span></td>
+          <td><span class="badge bg-light text-warning text-dark border">${m.claims_count || 0}</span></td>
+          <td><span class="small text-muted">${formatDate(m.created_at)}</span></td>
           <td class="text-end">
-            ${c.status === 'PENDING' ? `
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-success fw-semibold" onclick="adminDecision(${c.id}, 'APPROVED')" title="Approve Claim">
-                <i class="bi bi-check-lg"></i> Approve
+              <button class="btn btn-outline-primary" onclick="openEditMember(${m.id})" title="Edit Member Details">
+                <i class="bi bi-pencil-square"></i> Edit
               </button>
-              <button class="btn btn-outline-danger fw-semibold" onclick="adminDecision(${c.id}, 'REJECTED')" title="Reject Claim">
-                <i class="bi bi-x-lg"></i> Reject
+              <button class="btn btn-outline-danger" onclick="deleteMember(${m.id}, '${escapeHTML(m.name)}')" title="Delete Member">
+                <i class="bi bi-trash"></i>
               </button>
             </div>
-            ` : `<span class="small text-muted">Processed</span>`}
           </td>
         </tr>
       `).join('');
     }
 
+    function openEditMember(userId) {
+      const member = allMembersList.find(m => m.id === userId);
+      if (!member) return;
+
+      document.getElementById('edit-member-id').value = member.id;
+      document.getElementById('edit-member-name').value = member.name;
+      document.getElementById('edit-member-email').value = member.email;
+      document.getElementById('edit-member-phone').value = member.phone || '';
+      document.getElementById('edit-member-role').value = member.role_type;
+      document.getElementById('edit-member-admin').checked = !!member.is_admin;
+      document.getElementById('edit-member-password').value = '';
+
+      editMemberModalInstance.show();
+    }
+
+    async function deleteMember(userId, name) {
+      if (!confirm(`Are you sure you want to permanently delete member "${name}"? All their reported items and claims will also be deleted.`)) return;
+      try {
+        await API.admin.deleteUser(userId);
+        showToast(`Member "${name}" deleted.`, 'info');
+        loadAllAdminData();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete member.', 'danger');
+      }
+    }
+
+    // ==========================================
+    // RENDER: LOCATIONS
+    // ==========================================
+    function renderAdminLocations(locations) {
+      const tbody = document.getElementById('admin-locations-tbody');
+      if (locations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No locations configured yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = locations.map(loc => `
+        <tr>
+          <td>
+            <div class="fw-bold text-dark d-flex align-items-center">
+              <i class="bi bi-geo-alt-fill text-danger me-2"></i>${escapeHTML(loc.name)}
+            </div>
+          </td>
+          <td><span class="small text-muted">${loc.description ? escapeHTML(loc.description) : '—'}</span></td>
+          <td>
+            ${loc.is_active 
+              ? '<span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>' 
+              : '<span class="badge bg-secondary-subtle text-secondary">Inactive</span>'}
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border">${loc.items_count || 0} reports</span>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary" onclick="openEditLocation(${loc.id})" title="Edit Location">
+                <i class="bi bi-pencil-square"></i> Edit
+              </button>
+              <button class="btn btn-outline-danger" onclick="deleteLocation(${loc.id}, '${escapeHTML(loc.name)}')" title="Delete / Deactivate">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openEditLocation(locId) {
+      const loc = allLocationsList.find(l => l.id === locId);
+      if (!loc) return;
+
+      document.getElementById('loc-id').value = loc.id;
+      document.getElementById('loc-name').value = loc.name;
+      document.getElementById('loc-desc').value = loc.description || '';
+      document.getElementById('loc-is-active').checked = !!loc.is_active;
+      document.getElementById('loc-modal-action-title').textContent = 'Edit Campus Location';
+      document.getElementById('loc-active-group').classList.remove('d-none');
+
+      locationModalInstance.show();
+    }
+
+    async function deleteLocation(locId, name) {
+      if (!confirm(`Are you sure you want to remove or deactivate campus location "${name}"?`)) return;
+      try {
+        const res = await API.admin.deleteLocation(locId);
+        showToast(res.message || 'Location updated.', 'info');
+        loadAllAdminData();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete location.', 'danger');
+      }
+    }
+
+    // ==========================================
+    // RENDER: ITEMS & CLAIMS
+    // ==========================================
     function renderAdminItems(items) {
       const tbody = document.getElementById('admin-items-tbody');
       if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No items found.</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No items found.</td></tr>';
         return;
       }
 
@@ -294,6 +708,62 @@
       `).join('');
     }
 
+    function renderAdminClaims(claims) {
+      const tbody = document.getElementById('admin-claims-tbody');
+      const pendingCount = claims.filter(c => c.status === 'PENDING').length;
+      document.getElementById('pending-claims-badge').textContent = `${pendingCount} Pending`;
+
+      if (claims.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No claims records found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = claims.map(c => `
+        <tr class="${c.status === 'PENDING' ? 'table-warning table-opacity-10' : ''}">
+          <td>
+            <a href="/item.html?id=${c.item_id}" class="fw-bold text-dark text-decoration-none">
+              ${escapeHTML(c.item_title)}
+            </a>
+            <div class="small text-muted">${getTypeBadge(c.item_type)} &bull; ${escapeHTML(c.item_location)}</div>
+          </td>
+          <td>
+            <div class="fw-semibold">${escapeHTML(c.claimant_name)}</div>
+            <div class="small text-muted text-capitalize">${escapeHTML(c.claimant_role || 'User')}</div>
+          </td>
+          <td class="small">
+            <div><i class="bi bi-envelope me-1 text-primary"></i>${escapeHTML(c.claimant_email)}</div>
+            ${c.claimant_phone ? `<div><i class="bi bi-telephone me-1 text-success"></i>${escapeHTML(c.claimant_phone)}</div>` : ''}
+          </td>
+          <td>
+            <div class="small fw-semibold">${escapeHTML(c.owner_name)}</div>
+            <div class="small text-muted">${escapeHTML(c.owner_email)}</div>
+          </td>
+          <td>
+            <div class="small text-secondary p-2 bg-light rounded border" style="max-width: 250px;">
+              "${escapeHTML(c.proof_message)}"
+            </div>
+          </td>
+          <td>
+            ${c.status === 'PENDING' ? '<span class="badge bg-warning text-dark">Pending</span>' :
+              c.status === 'APPROVED' ? '<span class="badge bg-success">Approved</span>' :
+              '<span class="badge bg-secondary">Rejected</span>'}
+          </td>
+          <td class="text-end">
+            ${c.status === 'PENDING' ? `
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-success fw-semibold" onclick="adminDecision(${c.id}, 'APPROVED')" title="Approve Claim">
+                <i class="bi bi-check-lg"></i> Approve
+              </button>
+              <button class="btn btn-outline-danger fw-semibold" onclick="adminDecision(${c.id}, 'REJECTED')" title="Reject Claim">
+                <i class="bi bi-x-lg"></i> Reject
+              </button>
+            </div>
+            ` : '<span class="small text-muted">Processed</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
     async function adminDecision(claimId, status) {
       if (!confirm(`Confirm mark claim #${claimId} as ${status}?`)) return;
       try {
@@ -326,10 +796,28 @@
       }
     }
 
+    // ==========================================
+    // INITIALIZATION & EVENT LISTENERS
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
+      editMemberModalInstance = new bootstrap.Modal(document.getElementById('editMemberModal'));
+      locationModalInstance = new bootstrap.Modal(document.getElementById('locationModal'));
+
       loadAllAdminData();
 
-      // Quick filter
+      // Search filter members
+      document.getElementById('member-search-input')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = allMembersList.filter(m => 
+          m.name.toLowerCase().includes(q) ||
+          m.email.toLowerCase().includes(q) ||
+          m.role_type.toLowerCase().includes(q) ||
+          (m.phone && m.phone.toLowerCase().includes(q))
+        );
+        renderAdminMembers(filtered);
+      });
+
+      // Search filter items
       document.getElementById('admin-items-search')?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase();
         const filtered = allItemsList.filter(i => 
@@ -339,6 +827,81 @@
           i.reporter_name.toLowerCase().includes(q)
         );
         renderAdminItems(filtered);
+      });
+
+      // Submit Edit Member Form
+      document.getElementById('edit-member-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userId = parseInt(document.getElementById('edit-member-id').value, 10);
+        const name = document.getElementById('edit-member-name').value.trim();
+        const email = document.getElementById('edit-member-email').value.trim();
+        const phone = document.getElementById('edit-member-phone').value.trim();
+        const role_type = document.getElementById('edit-member-role').value;
+        const is_admin = document.getElementById('edit-member-admin').checked ? 1 : 0;
+        const new_password = document.getElementById('edit-member-password').value;
+
+        const saveBtn = document.getElementById('save-member-btn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+        try {
+          const payload = { name, email, phone, role_type, is_admin };
+          if (new_password) payload.new_password = new_password;
+
+          await API.admin.updateUser(userId, payload);
+          showToast(`Member "${name}" updated successfully!`, 'success');
+          editMemberModalInstance.hide();
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Member Changes';
+          loadAllAdminData();
+        } catch (err) {
+          showToast(err.message || 'Failed to update member.', 'danger');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Member Changes';
+        }
+      });
+
+      // Open Add Location Modal
+      document.getElementById('open-add-location-modal')?.addEventListener('click', () => {
+        document.getElementById('loc-id').value = '';
+        document.getElementById('loc-name').value = '';
+        document.getElementById('loc-desc').value = '';
+        document.getElementById('loc-modal-action-title').textContent = 'Add Campus Location';
+        document.getElementById('loc-active-group').classList.add('d-none');
+        document.getElementById('loc-is-active').checked = true;
+        locationModalInstance.show();
+      });
+
+      // Submit Add/Edit Location Form
+      document.getElementById('location-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const locId = document.getElementById('loc-id').value;
+        const name = document.getElementById('loc-name').value.trim();
+        const description = document.getElementById('loc-desc').value.trim();
+        const is_active = document.getElementById('loc-is-active').checked ? 1 : 0;
+
+        const saveBtn = document.getElementById('save-location-btn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+        try {
+          if (locId) {
+            await API.admin.updateLocation(locId, { name, description, is_active });
+            showToast(`Location "${name}" updated!`, 'success');
+          } else {
+            await API.admin.createLocation({ name, description });
+            showToast(`Location "${name}" added!`, 'success');
+          }
+
+          locationModalInstance.hide();
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Location';
+          loadAllAdminData();
+        } catch (err) {
+          showToast(err.message || 'Failed to save location.', 'danger');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Location';
+        }
       });
     });
   </script>

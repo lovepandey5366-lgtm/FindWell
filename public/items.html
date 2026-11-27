@@ -310,7 +310,20 @@
       fetchItems(1);
     }
 
+    async function populateLocationsFilter() {
+      try {
+        const data = await API.locations.list();
+        if (data.locations && data.locations.length > 0) {
+          const select = document.getElementById('filter-location');
+          const currentVal = select.value;
+          select.innerHTML = '<option value="">All Locations</option>' +
+            data.locations.map(l => `<option value="${escapeHTML(l.name)}" ${l.name === currentVal ? 'selected' : ''}>${escapeHTML(l.name)}</option>`).join('');
+        }
+      } catch (e) {}
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      populateLocationsFilter();
       // Parse URL query params
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('q')) document.getElementById('filter-q').value = urlParams.get('q');

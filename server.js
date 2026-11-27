@@ -39,6 +39,16 @@ app.use('/api/claims', claimsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Public locations listing endpoint
+app.get('/api/locations', (req, res) => {
+  try {
+    const locations = db.prepare('SELECT id, name, description FROM locations WHERE is_active = 1 ORDER BY name ASC').all();
+    res.json({ locations });
+  } catch (e) {
+    res.json({ locations: [] });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
