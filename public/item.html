@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Item Details | Campus Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <div id="navbar-container"></div>
+
+  <main class="py-4">
+    <div class="container">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="/index.html" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item"><a href="/items.html" class="text-decoration-none">Browse Items</a></li>
+          <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-title">Item Details</li>
+        </ol>
+      </nav>
+
+      <!-- Loading State -->
+      <div id="loading-container" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading item details...</span>
+        </div>
+      </div>
+
+      <!-- Item Main Content Container -->
+      <div id="item-content-container" class="d-none">
+        <div class="row g-4">
+          
+          <!-- Left Column: Image & Details -->
+          <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+              
+              <!-- Item Image / Banner Box -->
+              <div class="item-detail-img-box position-relative" id="item-image-box">
+                <!-- Image or Icon inserted here -->
+              </div>
+
+              <div class="card-body p-4">
+                
+                <!-- Badges Row -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                  <span id="item-type-badge"></span>
+                  <span id="item-status-badge"></span>
+                  <span class="badge bg-light text-dark border px-2 py-1">
+                    <i class="bi bi-tag me-1"></i><span id="item-category-text"></span>
+                  </span>
+                </div>
+
+                <!-- Title -->
+                <h2 class="fw-bold mb-3" id="item-title-text"></h2>
+
+                <!-- Status Lifecycle Tracker -->
+                <div class="bg-light p-3 rounded-4 mb-4 border">
+                  <div class="small fw-semibold text-muted text-uppercase mb-2">Item Recovery Lifecycle</div>
+                  <div class="status-timeline" id="status-timeline-bar">
+                    <div class="timeline-step completed" id="step-reported">
+                      <div class="timeline-icon"><i class="bi bi-file-earmark-check"></i></div>
+                      <div class="timeline-label">Reported</div>
+                    </div>
+                    <div class="timeline-step" id="step-pending">
+                      <div class="timeline-icon"><i class="bi bi-hourglass-split"></i></div>
+                      <div class="timeline-label">Claim Review</div>
+                    </div>
+                    <div class="timeline-step" id="step-returned">
+                      <div class="timeline-icon"><i class="bi bi-patch-check-fill"></i></div>
+                      <div class="timeline-label">Returned</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <h5 class="fw-bold mb-2">Description & Notes</h5>
+                <p class="text-secondary leading-relaxed mb-4" id="item-desc-text" style="white-space: pre-wrap; font-size: 1.05rem;"></p>
+
+                <!-- Key Attributes Grid -->
+                <div class="row g-3 p-3 bg-light rounded-4 border mb-4">
+                  <div class="col-sm-6">
+                    <div class="small text-muted">Campus Location</div>
+                    <div class="fw-semibold text-dark d-flex align-items-center mt-1">
+                      <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                      <span id="item-location-text"></span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="small text-muted">Date of Loss / Find</div>
+                    <div class="fw-semibold text-dark d-flex align-items-center mt-1">
+                      <i class="bi bi-calendar-event text-primary me-2"></i>
+                      <span id="item-date-text"></span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 border-top pt-2">
+                    <div class="small text-muted">Reported On</div>
+                    <div class="fw-semibold text-dark d-flex align-items-center mt-1">
+                      <i class="bi bi-clock text-secondary me-2"></i>
+                      <span id="item-created-text"></span>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 border-top pt-2">
+                    <div class="small text-muted">Contact Preference</div>
+                    <div class="fw-semibold text-dark d-flex align-items-center mt-1">
+                      <i class="bi bi-shield-lock text-success me-2"></i>
+                      <span id="item-contact-pref-text"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Claims on this item (Visible to Reporter or Admin) -->
+                <div id="claims-management-section" class="d-none mt-4 pt-3 border-top">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">
+                      <i class="bi bi-person-check me-2 text-primary"></i>Submitted Claims (<span id="claims-count-num">0</span>)
+                    </h5>
+                  </div>
+                  <div id="claims-list-container">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Smart Matching Section -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-inline-flex">
+                      <i class="bi bi-stars fs-4"></i>
+                    </div>
+                    <div>
+                      <h5 class="fw-bold mb-0">Possible Smart Matches</h5>
+                      <p class="text-muted small mb-0">Cross-referenced against opposite-type reports</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3" id="matches-grid">
+                  <div class="col-12 text-center py-3 text-muted small">
+                    Scanning for matches...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Reporter Info & Actions -->
+          <div class="col-lg-4">
+            
+            <!-- Actions Card -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4 sticky-top" style="top: 80px; z-index: 10;">
+              <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Actions</h5>
+
+                <!-- Action Button for Claimants -->
+                <div id="claim-action-box" class="mb-3">
+                  <button type="button" class="btn btn-primary w-100 py-3 rounded-3 fw-semibold shadow-sm" id="open-claim-modal-btn">
+                    <i class="bi bi-hand-index-thumb me-1"></i>
+                    <span id="claim-btn-text">I Think This is Mine (Claim)</span>
+                  </button>
+                </div>
+
+                <!-- Claimant's own claim status indicator -->
+                <div id="user-claim-status-alert" class="alert d-none py-2 mb-3 small" role="alert"></div>
+
+                <!-- Reporter / Admin Actions -->
+                <div id="owner-actions-box" class="d-none">
+                  <div class="small fw-semibold text-muted text-uppercase mb-2">Management Controls</div>
+                  <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-success fw-semibold py-2" id="btn-mark-returned">
+                      <i class="bi bi-patch-check me-1"></i>Mark as Returned
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary fw-semibold py-2" id="btn-edit-item">
+                      <i class="bi bi-pencil-square me-1"></i>Edit Report
+                    </button>
+                    <button type="button" class="btn btn-outline-danger fw-semibold py-2" id="btn-delete-item">
+                      <i class="bi bi-trash me-1"></i>Delete Report
+                    </button>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Reporter Profile Box -->
+                <h6 class="fw-bold mb-3">Reported By</h6>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                    <i class="bi bi-person"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark" id="reporter-name-text">Campus User</div>
+                    <div class="small text-muted text-capitalize" id="reporter-role-text">Student</div>
+                  </div>
+                </div>
+
+                <div id="reporter-contact-details" class="small p-3 bg-light rounded-3 border">
+                  <!-- Contact info inserted here -->
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Claim Modal -->
+  <div class="modal fade" id="claimModal" tabindex="-1" aria-labelledby="claimModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="claimModalLabel">
+            <i class="bi bi-shield-check text-primary me-2"></i>Submit Ownership Claim
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-muted small">
+            To prevent false claims, please describe unique identifying details not visible in public photos (e.g. wallpaper, engravings, serial number, bag contents).
+          </p>
+          <div id="claim-modal-alert" class="alert d-none py-2 small" role="alert"></div>
+          <form id="claim-form">
+            <div class="mb-3">
+              <label for="proof_message" class="form-label small fw-semibold">Verification Proof *</label>
+              <textarea class="form-control" id="proof_message" rows="4" placeholder="Detail specific markings, interior contents, scratches, or when/where you mislaid it..." required minlength="5"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold" id="submit-claim-btn">
+              Submit Claim for Verification
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Item Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="editModalLabel">
+            <i class="bi bi-pencil-square text-primary me-2"></i>Edit Report Details
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="edit-item-form">
+            <div class="mb-3">
+              <label for="edit-title" class="form-label small fw-semibold">Title *</label>
+              <input type="text" class="form-control" id="edit-title" required minlength="3">
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-category" class="form-label small fw-semibold">Category *</label>
+                <select class="form-select" id="edit-category" required>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Wallet/Bags">Wallet & Bags</option>
+                  <option value="ID/Cards">ID & Cards</option>
+                  <option value="Keys">Keys</option>
+                  <option value="Books">Books</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="edit-location" class="form-label small fw-semibold">Location *</label>
+                <input type="text" class="form-control" id="edit-location" required>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-date" class="form-label small fw-semibold">Date of Incident *</label>
+                <input type="date" class="form-control" id="edit-date" required>
+              </div>
+              <div class="col-md-6">
+                <label for="edit-status" class="form-label small fw-semibold">Status *</label>
+                <select class="form-select" id="edit-status" required>
+                  <option value="OPEN">Active / Open</option>
+                  <option value="CLAIM_PENDING">Claim Pending</option>
+                  <option value="RETURNED">Returned</option>
+                  <option value="CLOSED">Closed</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="edit-description" class="form-label small fw-semibold">Description *</label>
+              <textarea class="form-control" id="edit-description" rows="4" required minlength="5"></textarea>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold" id="save-edit-btn">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let currentItem = null;
+    let claimModalInstance = null;
+    let editModalInstance = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = parseInt(urlParams.get('id'), 10);
+
+    async function loadItem() {
+      if (!itemId) {
+        showToast('Invalid item ID requested.', 'danger');
+        window.location.href = '/items.html';
+        return;
+      }
+
+      try {
+        const data = await API.items.get(itemId);
+        currentItem = data.item;
+
+        document.getElementById('loading-container').classList.add('d-none');
+        document.getElementById('item-content-container').classList.remove('d-none');
+
+        // Populate header & breadcrumb
+        document.title = `${currentItem.title} | Campus Lost & Found`;
+        document.getElementById('breadcrumb-title').textContent = currentItem.title;
+        document.getElementById('item-title-text').textContent = currentItem.title;
+        document.getElementById('item-desc-text').textContent = currentItem.description;
+        document.getElementById('item-category-text').textContent = currentItem.category;
+        document.getElementById('item-location-text').textContent = currentItem.location;
+        document.getElementById('item-date-text').textContent = formatDate(currentItem.date_event);
+        document.getElementById('item-created-text').textContent = formatDate(currentItem.created_at);
+        document.getElementById('item-contact-pref-text').textContent = currentItem.contact_pref || 'Email';
+
+        // Badges
+        document.getElementById('item-type-badge').innerHTML = getTypeBadge(currentItem.type);
+        document.getElementById('item-status-badge').innerHTML = getStatusBadge(currentItem.status);
+
+        // Image / Banner
+        const imgBox = document.getElementById('item-image-box');
+        if (currentItem.image_path) {
+          imgBox.innerHTML = `<img src="${escapeHTML(currentItem.image_path)}" alt="${escapeHTML(currentItem.title)}" class="img-fluid">`;
+        } else {
+          imgBox.innerHTML = `
+            <div class="text-center py-5">
+              <i class="bi ${getCategoryIcon(currentItem.category)} text-secondary" style="font-size: 5rem;"></i>
+              <div class="small text-muted mt-2">No photo uploaded</div>
+            </div>
+          `;
+        }
+
+        // Timeline steps
+        const stepReported = document.getElementById('step-reported');
+        const stepPending = document.getElementById('step-pending');
+        const stepReturned = document.getElementById('step-returned');
+
+        stepPending.className = 'timeline-step';
+        stepReturned.className = 'timeline-step';
+
+        if (currentItem.status === 'CLAIM_PENDING') {
+          stepPending.classList.add('active');
+        } else if (currentItem.status === 'RETURNED') {
+          stepPending.classList.add('completed');
+          stepReturned.classList.add('completed');
+        }
+
+        // Reporter Profile
+        document.getElementById('reporter-name-text').textContent = currentItem.reporter_name || 'Anonymous User';
+        document.getElementById('reporter-role-text').textContent = currentItem.reporter_role || 'Campus Member';
+
+        const contactDetailsBox = document.getElementById('reporter-contact-details');
+        if (currentItem.reporter_email || currentItem.reporter_phone) {
+          contactDetailsBox.innerHTML = `
+            ${currentItem.reporter_email ? `<div><i class="bi bi-envelope me-2 text-primary"></i>${escapeHTML(currentItem.reporter_email)}</div>` : ''}
+            ${currentItem.reporter_phone ? `<div class="mt-1"><i class="bi bi-telephone me-2 text-success"></i>${escapeHTML(currentItem.reporter_phone)}</div>` : ''}
+          `;
+        } else {
+          contactDetailsBox.innerHTML = `
+            <div class="text-muted"><i class="bi bi-lock me-1"></i>Contact details protected by privacy settings. Submit a claim to communicate.</div>
+          `;
+        }
+
+        // Setup Owner/Admin actions
+        const ownerActionsBox = document.getElementById('owner-actions-box');
+        const claimActionBox = document.getElementById('claim-action-box');
+        const userClaimAlert = document.getElementById('user-claim-status-alert');
+
+        if (data.isOwner || data.isAdmin) {
+          ownerActionsBox.classList.remove('d-none');
+          claimActionBox.classList.add('d-none');
+
+          // Render claims list
+          renderClaimsList(data.claims);
+        } else {
+          ownerActionsBox.classList.add('d-none');
+
+          // If current user already submitted a claim
+          if (data.userClaim) {
+            claimActionBox.classList.add('d-none');
+            userClaimAlert.classList.remove('d-none');
+            const cStatus = data.userClaim.status;
+            if (cStatus === 'PENDING') {
+              userClaimAlert.className = 'alert alert-warning py-2 mb-3 small';
+              userClaimAlert.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>You have an active pending claim for this item.';
+            } else if (cStatus === 'APPROVED') {
+              userClaimAlert.className = 'alert alert-success py-2 mb-3 small';
+              userClaimAlert.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Your claim on this item was <strong>APPROVED</strong>! Please coordinate return.';
+            } else {
+              userClaimAlert.className = 'alert alert-danger py-2 mb-3 small';
+              userClaimAlert.innerHTML = '<i class="bi bi-x-circle me-1"></i>Your claim on this item was not approved.';
+            }
+          } else if (currentItem.status === 'RETURNED' || currentItem.status === 'CLOSED') {
+            claimActionBox.classList.add('d-none');
+          } else {
+            claimActionBox.classList.remove('d-none');
+            const btnText = document.getElementById('claim-btn-text');
+            btnText.textContent = currentItem.type === 'FOUND' ? 'I Think This is Mine (Claim)' : 'I Found This Item (Submit Info)';
+          }
+        }
+
+        // Load Smart Matches
+        loadMatches();
+      } catch (err) {
+        document.getElementById('loading-container').innerHTML = `
+          <div class="alert alert-danger d-inline-block py-3 px-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>${escapeHTML(err.message || 'Item not found.')}
+            <div class="mt-2"><a href="/items.html" class="btn btn-sm btn-outline-danger">Back to Items</a></div>
+          </div>
+        `;
+      }
+    }
+
+    function renderClaimsList(claims = []) {
+      const claimsSection = document.getElementById('claims-management-section');
+      const countNum = document.getElementById('claims-count-num');
+      const container = document.getElementById('claims-list-container');
+
+      claimsSection.classList.remove('d-none');
+      countNum.textContent = claims.length;
+
+      if (claims.length === 0) {
+        container.innerHTML = `
+          <div class="p-3 bg-light rounded-3 text-muted small text-center">
+            No claims have been submitted for this item yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = claims.map(c => `
+        <div class="border rounded-3 p-3 mb-3 bg-white shadow-sm">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+            <div>
+              <strong class="text-dark">${escapeHTML(c.claimant_name)}</strong>
+              <span class="badge bg-light text-secondary border ms-1 text-capitalize">${escapeHTML(c.claimant_role || 'User')}</span>
+              <span class="small text-muted ms-2"><i class="bi bi-clock me-1"></i>${formatDate(c.created_at)}</span>
+            </div>
+            <div>
+              ${c.status === 'PENDING' ? '<span class="badge bg-warning text-dark">Pending Review</span>' :
+                c.status === 'APPROVED' ? '<span class="badge bg-success">Approved</span>' :
+                '<span class="badge bg-secondary">Rejected</span>'}
+            </div>
+          </div>
+
+          <div class="p-2 bg-light rounded small mb-2 border text-dark">
+            <strong>Proof Message:</strong> "${escapeHTML(c.proof_message)}"
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="small text-muted">
+              ${c.claimant_email ? `<span class="me-3"><i class="bi bi-envelope me-1"></i>${escapeHTML(c.claimant_email)}</span>` : ''}
+              ${c.claimant_phone ? `<span><i class="bi bi-telephone me-1"></i>${escapeHTML(c.claimant_phone)}</span>` : ''}
+            </div>
+
+            ${c.status === 'PENDING' ? `
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-success fw-semibold" onclick="handleClaimDecision(${c.id}, 'APPROVED')">
+                <i class="bi bi-check-lg me-1"></i>Approve
+              </button>
+              <button class="btn btn-outline-danger fw-semibold" onclick="handleClaimDecision(${c.id}, 'REJECTED')">
+                <i class="bi bi-x-lg me-1"></i>Reject
+              </button>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function handleClaimDecision(claimId, status) {
+      if (!confirm(`Are you sure you want to mark this claim as ${status}?`)) return;
+
+      try {
+        await API.claims.updateStatus(claimId, status);
+        showToast(`Claim has been ${status.toLowerCase()}!`, 'success');
+        loadItem();
+      } catch (err) {
+        showToast(err.message || 'Failed to update claim.', 'danger');
+      }
+    }
+
+    async function loadMatches() {
+      const grid = document.getElementById('matches-grid');
+      try {
+        const data = await API.items.matches(itemId);
+        if (!data.matches || data.matches.length === 0) {
+          grid.innerHTML = `
+            <div class="col-12 text-center py-4 text-muted small">
+              <i class="bi bi-search me-1"></i>No high-confidence match found at the moment. As more campus reports arrive, automatic alerts will be generated.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = data.matches.map(m => `
+          <div class="col-md-6">
+            <div class="border rounded-3 p-3 bg-white h-100 d-flex flex-column shadow-sm">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                ${getTypeBadge(m.type)}
+                <span class="match-score-badge">
+                  <i class="bi bi-lightning-charge-fill me-1"></i>${m.match_score}% Match
+                </span>
+              </div>
+              <h6 class="fw-bold mb-1 text-truncate">${escapeHTML(m.title)}</h6>
+              <div class="small text-muted mb-2">
+                <i class="bi bi-geo-alt me-1 text-danger"></i>${escapeHTML(m.location)} &bull; 
+                <i class="bi bi-calendar3 me-1"></i>${formatDate(m.date_event)}
+              </div>
+              <p class="small text-secondary mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                ${escapeHTML(m.description)}
+              </p>
+              <div class="mt-auto">
+                <a href="/item.html?id=${m.id}" class="btn btn-sm btn-outline-primary w-100 fw-semibold">
+                  Inspect Matched Item <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        grid.innerHTML = `<div class="col-12 small text-danger py-2">Unable to compute matches right now.</div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadItem();
+
+      claimModalInstance = new bootstrap.Modal(document.getElementById('claimModal'));
+      editModalInstance = new bootstrap.Modal(document.getElementById('editModal'));
+
+      // Open Claim Modal
+      document.getElementById('open-claim-modal-btn').addEventListener('click', async () => {
+        try {
+          await API.auth.me();
+          claimModalInstance.show();
+        } catch (err) {
+          showToast('Please sign in to submit a claim.', 'warning');
+          setTimeout(() => {
+            window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+          }, 800);
+        }
+      });
+
+      // Submit Claim Form
+      document.getElementById('claim-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const proof = document.getElementById('proof_message').value.trim();
+        const alertBox = document.getElementById('claim-modal-alert');
+        const submitBtn = document.getElementById('submit-claim-btn');
+
+        alertBox.className = 'alert d-none';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+
+        try {
+          await API.claims.create(itemId, proof);
+          showToast('Claim submitted successfully!', 'success');
+          claimModalInstance.hide();
+          loadItem();
+        } catch (err) {
+          alertBox.className = 'alert alert-danger py-2 small';
+          alertBox.textContent = err.message || 'Failed to submit claim.';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Submit Claim for Verification';
+        }
+      });
+
+      // Mark as Returned
+      document.getElementById('btn-mark-returned')?.addEventListener('click', async () => {
+        if (!confirm('Mark this item as successfully RETURNED to its owner?')) return;
+        try {
+          await API.items.update(itemId, { status: 'RETURNED' });
+          showToast('Item status updated to RETURNED!', 'success');
+          loadItem();
+        } catch (err) {
+          showToast(err.message || 'Failed to update item status.', 'danger');
+        }
+      });
+
+      // Delete Item
+      document.getElementById('btn-delete-item')?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to permanently delete this report? This cannot be undone.')) return;
+        try {
+          await API.items.delete(itemId);
+          showToast('Item deleted successfully.', 'info');
+          setTimeout(() => {
+            window.location.href = '/items.html';
+          }, 600);
+        } catch (err) {
+          showToast(err.message || 'Failed to delete item.', 'danger');
+        }
+      });
+
+      // Open Edit Modal
+      document.getElementById('btn-edit-item')?.addEventListener('click', () => {
+        if (!currentItem) return;
+        document.getElementById('edit-title').value = currentItem.title;
+        document.getElementById('edit-category').value = currentItem.category;
+        document.getElementById('edit-location').value = currentItem.location;
+        document.getElementById('edit-date').value = currentItem.date_event;
+        document.getElementById('edit-status').value = currentItem.status;
+        document.getElementById('edit-description').value = currentItem.description;
+        editModalInstance.show();
+      });
+
+      // Save Edit Form
+      document.getElementById('edit-item-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const saveBtn = document.getElementById('save-edit-btn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+        try {
+          await API.items.update(itemId, {
+            title: document.getElementById('edit-title').value.trim(),
+            category: document.getElementById('edit-category').value,
+            location: document.getElementById('edit-location').value.trim(),
+            date_event: document.getElementById('edit-date').value,
+            status: document.getElementById('edit-status').value,
+            description: document.getElementById('edit-description').value.trim()
+          });
+
+          showToast('Report updated successfully!', 'success');
+          editModalInstance.hide();
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Changes';
+          loadItem();
+        } catch (err) {
+          showToast(err.message || 'Failed to update item.', 'danger');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Save Changes';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

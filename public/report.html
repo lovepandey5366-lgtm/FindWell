@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report an Item | Campus Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <div id="navbar-container"></div>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          
+          <!-- Card Form -->
+          <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+
+              <div class="mb-4 text-center">
+                <h3 class="fw-bold mb-1" id="form-heading">Report an Item</h3>
+                <p class="text-muted small">Provide clear details to accelerate matching and recovery</p>
+                
+                <!-- Type Toggle Pills -->
+                <div class="d-inline-flex p-1 bg-light rounded-pill border mt-2">
+                  <button type="button" class="btn btn-sm rounded-pill px-4 fw-semibold type-pill-btn active" id="btn-type-lost" data-type="LOST">
+                    <i class="bi bi-exclamation-octagon me-1"></i>I Lost Something
+                  </button>
+                  <button type="button" class="btn btn-sm rounded-pill px-4 fw-semibold type-pill-btn text-muted" id="btn-type-found" data-type="FOUND">
+                    <i class="bi bi-check-circle me-1"></i>I Found Something
+                  </button>
+                </div>
+              </div>
+
+              <!-- Alert Box -->
+              <div id="report-alert" class="alert d-none" role="alert"></div>
+
+              <form id="report-form" enctype="multipart/form-data">
+                <input type="hidden" id="report_type" name="type" value="LOST">
+
+                <!-- Title -->
+                <div class="mb-3">
+                  <label for="title" class="form-label small fw-semibold">Item Title *</label>
+                  <input type="text" class="form-control form-control-lg fs-6" id="title" name="title" placeholder="e.g. Blue Dell Laptop Charger or Black Leather Fossil Wallet" required minlength="3">
+                  <div class="form-text small">Include item brand, color, or model in the title for better smart matching.</div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <!-- Category -->
+                  <div class="col-md-6">
+                    <label for="category" class="form-label small fw-semibold">Category *</label>
+                    <select class="form-select" id="category" name="category" required>
+                      <option value="" disabled selected>Select category...</option>
+                      <option value="Electronics">Electronics (Laptop, Phone, Charger, Audio)</option>
+                      <option value="Wallet/Bags">Wallet & Bags (Backpack, Purse, Pouch)</option>
+                      <option value="ID/Cards">ID & Cards (College ID, Metro, ATM)</option>
+                      <option value="Keys">Keys (Room, Bike, Car)</option>
+                      <option value="Books">Books & Notebooks</option>
+                      <option value="Accessories">Accessories (Watch, Glasses, Jewelry)</option>
+                      <option value="Clothing">Clothing & Apparel (Hoodie, Cap)</option>
+                      <option value="Other">Other Items</option>
+                    </select>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="col-md-6">
+                    <label for="location_select" class="form-label small fw-semibold">Campus Location *</label>
+                    <select class="form-select" id="location_select" required>
+                      <option value="" disabled selected>Select campus location...</option>
+                      <option value="Library">Central Library</option>
+                      <option value="Canteen">Campus Canteen / Food Court</option>
+                      <option value="Hostel">Hostel Block / Common Room</option>
+                      <option value="Labs">Computer / Science Laboratories</option>
+                      <option value="Classroom Block">Classroom Block / Lecture Hall</option>
+                      <option value="Main Gate">Main Gate / Security Checkpoint</option>
+                      <option value="Ground">Sports Ground / Gymnasium</option>
+                      <option value="Parking">Vehicular Parking Area</option>
+                      <option value="Other">Other / Specific Area</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Custom location input if "Other" selected -->
+                <div class="mb-3 d-none" id="custom-location-group">
+                  <label for="custom_location" class="form-label small fw-semibold">Specify Specific Location *</label>
+                  <input type="text" class="form-control" id="custom_location" placeholder="e.g. Auditorium 2nd Floor, Room 402, Basketball court">
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <!-- Date of event -->
+                  <div class="col-md-6">
+                    <label for="date_event" class="form-label small fw-semibold">Date of Incident *</label>
+                    <input type="date" class="form-control" id="date_event" name="date_event" required>
+                  </div>
+
+                  <!-- Contact Preference -->
+                  <div class="col-md-6">
+                    <label for="contact_pref" class="form-label small fw-semibold">Contact Preference</label>
+                    <select class="form-select" id="contact_pref" name="contact_pref">
+                      <option value="Email" selected>Email (Show verified email to logged-in users)</option>
+                      <option value="Phone">Phone (Show contact phone if available)</option>
+                      <option value="System Claims Only">System Claims Only (Protect privacy, keep contact hidden)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Detailed Description -->
+                <div class="mb-4">
+                  <label for="description" class="form-label small fw-semibold">Detailed Description *</label>
+                  <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe distinct features, stickers, scratches, contents, or circumstances where it was misplaced/found..." required minlength="5"></textarea>
+                  <div class="form-text small">Do NOT share critical secret codes or PINs. Keep unique identifiers for claim proof verification.</div>
+                </div>
+
+                <!-- Image Upload with Drag & Drop Preview -->
+                <div class="mb-4">
+                  <label class="form-label small fw-semibold">Item Image (Optional, max 5 MB)</label>
+                  <div class="image-preview-container" id="drop-zone">
+                    <div id="drop-zone-prompt">
+                      <i class="bi bi-cloud-arrow-up fs-1 text-primary mb-2 d-block"></i>
+                      <div class="fw-semibold">Click or drag & drop an image here</div>
+                      <div class="small text-muted">Supports JPG, PNG, WebP up to 5 MB</div>
+                    </div>
+                    <div id="drop-zone-preview" class="d-none">
+                      <img src="" id="image-preview-img" alt="Preview" class="img-fluid rounded mb-2" style="max-height: 200px;">
+                      <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="remove-img-btn">
+                          <i class="bi bi-trash me-1"></i>Remove Image
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="file" id="image-input" name="image" class="d-none" accept="image/jpeg,image/png,image/webp">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-semibold shadow-sm" id="submit-btn">
+                  <i class="bi bi-send me-1"></i>Publish Report
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check auth status
+      try {
+        await API.auth.me();
+      } catch (err) {
+        showToast('Please sign in to submit a report.', 'warning');
+        setTimeout(() => {
+          window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        }, 800);
+        return;
+      }
+
+      // Default date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date_event').value = today;
+      document.getElementById('date_event').max = today;
+
+      // Handle type from query param
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialType = (urlParams.get('type') || 'LOST').toUpperCase();
+      setType(initialType);
+
+      // Type toggles
+      document.getElementById('btn-type-lost').addEventListener('click', () => setType('LOST'));
+      document.getElementById('btn-type-found').addEventListener('click', () => setType('FOUND'));
+
+      function setType(type) {
+        document.getElementById('report_type').value = type;
+        const btnLost = document.getElementById('btn-type-lost');
+        const btnFound = document.getElementById('btn-type-found');
+        const heading = document.getElementById('form-heading');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (type === 'LOST') {
+          btnLost.className = 'btn btn-sm rounded-pill px-4 fw-semibold btn-danger active';
+          btnFound.className = 'btn btn-sm rounded-pill px-4 fw-semibold text-muted';
+          heading.textContent = 'Report a Lost Item';
+          submitBtn.className = 'btn btn-danger w-100 py-3 rounded-3 fw-semibold shadow-sm';
+          submitBtn.innerHTML = '<i class="bi bi-exclamation-octagon me-1"></i>Publish Lost Item Report';
+        } else {
+          btnFound.className = 'btn btn-sm rounded-pill px-4 fw-semibold btn-success active';
+          btnLost.className = 'btn btn-sm rounded-pill px-4 fw-semibold text-muted';
+          heading.textContent = 'Report a Found Item';
+          submitBtn.className = 'btn btn-success w-100 py-3 rounded-3 fw-semibold shadow-sm';
+          submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Publish Found Item Report';
+        }
+      }
+
+      // Location dropdown "Other" toggle
+      const locationSelect = document.getElementById('location_select');
+      const customLocationGroup = document.getElementById('custom-location-group');
+      const customLocationInput = document.getElementById('custom_location');
+
+      locationSelect.addEventListener('change', () => {
+        if (locationSelect.value === 'Other') {
+          customLocationGroup.classList.remove('d-none');
+          customLocationInput.required = true;
+          customLocationInput.focus();
+        } else {
+          customLocationGroup.classList.add('d-none');
+          customLocationInput.required = false;
+        }
+      });
+
+      // Image upload drag & drop and preview
+      const dropZone = document.getElementById('drop-zone');
+      const imageInput = document.getElementById('image-input');
+      const promptBox = document.getElementById('drop-zone-prompt');
+      const previewBox = document.getElementById('drop-zone-preview');
+      const previewImg = document.getElementById('image-preview-img');
+      const removeImgBtn = document.getElementById('remove-img-btn');
+
+      dropZone.addEventListener('click', (e) => {
+        if (e.target !== removeImgBtn && !removeImgBtn.contains(e.target)) {
+          imageInput.click();
+        }
+      });
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#2563eb';
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.style.borderColor = '#cbd5e1';
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#cbd5e1';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      imageInput.addEventListener('change', () => {
+        if (imageInput.files && imageInput.files[0]) {
+          handleFile(imageInput.files[0]);
+        }
+      });
+
+      function handleFile(file) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+          showToast('Only JPG, PNG, and WebP images are allowed.', 'danger');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('Image size must be under 5 MB.', 'danger');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          promptBox.classList.add('d-none');
+          previewBox.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      removeImgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        imageInput.value = '';
+        previewImg.src = '';
+        previewBox.classList.add('d-none');
+        promptBox.classList.remove('d-none');
+      });
+
+      // Form submission
+      const form = document.getElementById('report-form');
+      const alertBox = document.getElementById('report-alert');
+      const submitBtn = document.getElementById('submit-btn');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.className = 'alert d-none';
+
+        const finalLocation = locationSelect.value === 'Other'
+          ? customLocationInput.value.trim()
+          : locationSelect.value;
+
+        if (!finalLocation) {
+          alertBox.className = 'alert alert-danger py-2 small';
+          alertBox.textContent = 'Please specify the campus location.';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('type', document.getElementById('report_type').value);
+        formData.append('title', document.getElementById('title').value.trim());
+        formData.append('category', document.getElementById('category').value);
+        formData.append('location', finalLocation);
+        formData.append('date_event', document.getElementById('date_event').value);
+        formData.append('contact_pref', document.getElementById('contact_pref').value);
+        formData.append('description', document.getElementById('description').value.trim());
+
+        if (imageInput.files && imageInput.files[0]) {
+          formData.append('image', imageInput.files[0]);
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Publishing report...';
+
+        try {
+          const res = await API.items.create(formData);
+          showToast(res.message || 'Report published successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = `/item.html?id=${res.item.id}`;
+          }, 600);
+        } catch (err) {
+          alertBox.className = 'alert alert-danger py-2 small';
+          alertBox.textContent = err.message || 'Failed to submit report. Please review your entries.';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Publish Report';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

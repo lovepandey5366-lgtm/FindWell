@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Campus Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <div id="navbar-container"></div>
+
+  <main class="py-4">
+    <div class="container-fluid px-lg-5">
+      
+      <!-- Admin Header -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-danger px-2 py-1"><i class="bi bi-shield-lock-fill me-1"></i>ADMIN ONLY</span>
+            <h2 class="fw-bold mb-0">Campus Administration Portal</h2>
+          </div>
+          <p class="text-muted small mb-0 mt-1">Manage all campus reports, claims verification, and recovery analytics</p>
+        </div>
+        <div>
+          <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="loadAllAdminData()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Metrics Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-2">
+          <div class="stat-card stat-lost">
+            <div class="stat-value text-danger" id="admin-stat-lost">-</div>
+            <div class="stat-label">Total Lost</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="stat-card stat-found">
+            <div class="stat-value text-success" id="admin-stat-found">-</div>
+            <div class="stat-label">Total Found</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="stat-card stat-returned">
+            <div class="stat-value" style="color: #6366f1;" id="admin-stat-returned">-</div>
+            <div class="stat-label">Returned</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="stat-card stat-rate">
+            <div class="stat-value text-warning" id="admin-stat-rate">-%</div>
+            <div class="stat-label">Recovery Rate</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="stat-card">
+            <div class="stat-value text-primary" id="admin-stat-pending-claims">-</div>
+            <div class="stat-label">Pending Claims</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <div class="stat-card" style="border-left-color: #64748b;">
+            <div class="stat-value text-secondary" id="admin-stat-users">-</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Pending Claims Requiring Verification -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-hourglass-top text-warning me-2"></i>Campus Claims Queue
+          </h5>
+          <span class="badge bg-warning text-dark px-3 py-2 rounded-pill small" id="pending-claims-badge">0 Pending</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Item Under Claim</th>
+                  <th>Claimant Name</th>
+                  <th>Claimant Contact</th>
+                  <th>Reported By</th>
+                  <th>Proof Message</th>
+                  <th>Status</th>
+                  <th class="text-end">Verification Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-claims-tbody">
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading claims queue...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: All Campus Items Management -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-header bg-white border-0 py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+          <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-list-task text-primary me-2"></i>All Campus Reports Directory
+          </h5>
+          <div class="d-flex gap-2">
+            <input type="text" id="admin-items-search" class="form-control form-control-sm" placeholder="Filter table..." style="width: 220px;">
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Item Title</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Campus Location</th>
+                  <th>Reporter</th>
+                  <th>Claims</th>
+                  <th>Status</th>
+                  <th class="text-end">Manage Status / Delete</th>
+                </tr>
+              </thead>
+              <tbody id="admin-items-tbody">
+                <tr>
+                  <td colspan="8" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading items list...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let allItemsList = [];
+    let allClaimsList = [];
+
+    async function loadAllAdminData() {
+      try {
+        const authData = await API.auth.me();
+        if (!authData.user || !authData.user.is_admin) {
+          showToast('Access denied: Administrator privileges required.', 'danger');
+          setTimeout(() => { window.location.href = '/dashboard.html'; }, 800);
+          return;
+        }
+
+        // 1. Load Stats
+        const statsData = await API.admin.stats();
+        const s = statsData.stats;
+        document.getElementById('admin-stat-lost').textContent = s.totalLost;
+        document.getElementById('admin-stat-found').textContent = s.totalFound;
+        document.getElementById('admin-stat-returned').textContent = s.totalReturned;
+        document.getElementById('admin-stat-rate').textContent = `${s.recoveryRate}%`;
+        document.getElementById('admin-stat-pending-claims').textContent = s.totalPendingClaims;
+        document.getElementById('admin-stat-users').textContent = s.totalUsers;
+
+        // 2. Load Claims
+        const claimsData = await API.admin.claims();
+        allClaimsList = claimsData.claims || [];
+        renderAdminClaims(allClaimsList);
+
+        // 3. Load Items
+        const itemsData = await API.admin.items();
+        allItemsList = itemsData.items || [];
+        renderAdminItems(allItemsList);
+
+      } catch (err) {
+        showToast(err.message || 'Failed to load administrator data.', 'danger');
+      }
+    }
+
+    function renderAdminClaims(claims) {
+      const tbody = document.getElementById('admin-claims-tbody');
+      const pendingCount = claims.filter(c => c.status === 'PENDING').length;
+      document.getElementById('pending-claims-badge').textContent = `${pendingCount} Pending`;
+
+      if (claims.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="7" class="text-center py-4 text-muted">No claims records found.</td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = claims.map(c => `
+        <tr class="${c.status === 'PENDING' ? 'table-warning table-opacity-10' : ''}">
+          <td>
+            <a href="/item.html?id=${c.item_id}" class="fw-bold text-dark text-decoration-none">
+              ${escapeHTML(c.item_title)}
+            </a>
+            <div class="small text-muted">${getTypeBadge(c.item_type)} &bull; ${escapeHTML(c.item_location)}</div>
+          </td>
+          <td>
+            <div class="fw-semibold">${escapeHTML(c.claimant_name)}</div>
+            <div class="small text-muted text-capitalize">${escapeHTML(c.claimant_role || 'User')}</div>
+          </td>
+          <td class="small">
+            <div><i class="bi bi-envelope me-1 text-primary"></i>${escapeHTML(c.claimant_email)}</div>
+            ${c.claimant_phone ? `<div><i class="bi bi-telephone me-1 text-success"></i>${escapeHTML(c.claimant_phone)}</div>` : ''}
+          </td>
+          <td>
+            <div class="small fw-semibold">${escapeHTML(c.owner_name)}</div>
+            <div class="small text-muted">${escapeHTML(c.owner_email)}</div>
+          </td>
+          <td>
+            <div class="small text-secondary p-2 bg-light rounded border" style="max-width: 250px;">
+              "${escapeHTML(c.proof_message)}"
+            </div>
+          </td>
+          <td>
+            ${c.status === 'PENDING' ? '<span class="badge bg-warning text-dark">Pending</span>' :
+              c.status === 'APPROVED' ? '<span class="badge bg-success">Approved</span>' :
+              '<span class="badge bg-secondary">Rejected</span>'}
+          </td>
+          <td class="text-end">
+            ${c.status === 'PENDING' ? `
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-success fw-semibold" onclick="adminDecision(${c.id}, 'APPROVED')" title="Approve Claim">
+                <i class="bi bi-check-lg"></i> Approve
+              </button>
+              <button class="btn btn-outline-danger fw-semibold" onclick="adminDecision(${c.id}, 'REJECTED')" title="Reject Claim">
+                <i class="bi bi-x-lg"></i> Reject
+              </button>
+            </div>
+            ` : `<span class="small text-muted">Processed</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminItems(items) {
+      const tbody = document.getElementById('admin-items-tbody');
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No items found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td>
+            <a href="/item.html?id=${item.id}" class="fw-bold text-dark text-decoration-none">
+              ${escapeHTML(item.title)}
+            </a>
+            <div class="small text-muted"><i class="bi bi-calendar3 me-1"></i>${formatDate(item.date_event)}</div>
+          </td>
+          <td>${getTypeBadge(item.type)}</td>
+          <td><span class="small text-secondary">${escapeHTML(item.category)}</span></td>
+          <td><span class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>${escapeHTML(item.location)}</span></td>
+          <td>
+            <div class="small fw-semibold">${escapeHTML(item.reporter_name)}</div>
+            <div class="small text-muted">${escapeHTML(item.reporter_email)}</div>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border">${item.claims_count || 0}</span>
+          </td>
+          <td>
+            <select class="form-select form-select-sm" onchange="updateItemStatus(${item.id}, this.value)" style="width: 140px;">
+              <option value="OPEN" ${item.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
+              <option value="CLAIM_PENDING" ${item.status === 'CLAIM_PENDING' ? 'selected' : ''}>CLAIM_PENDING</option>
+              <option value="RETURNED" ${item.status === 'RETURNED' ? 'selected' : ''}>RETURNED</option>
+              <option value="CLOSED" ${item.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
+            </select>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="/item.html?id=${item.id}" class="btn btn-outline-primary" title="View Details">
+                <i class="bi bi-eye"></i>
+              </a>
+              <button class="btn btn-outline-danger" onclick="adminDeleteItem(${item.id})" title="Delete Item">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function adminDecision(claimId, status) {
+      if (!confirm(`Confirm mark claim #${claimId} as ${status}?`)) return;
+      try {
+        await API.claims.updateStatus(claimId, status);
+        showToast(`Claim successfully marked as ${status}!`, 'success');
+        loadAllAdminData();
+      } catch (err) {
+        showToast(err.message || 'Action failed.', 'danger');
+      }
+    }
+
+    async function updateItemStatus(itemId, newStatus) {
+      try {
+        await API.items.update(itemId, { status: newStatus });
+        showToast('Item status updated.', 'success');
+        loadAllAdminData();
+      } catch (err) {
+        showToast(err.message || 'Status update failed.', 'danger');
+      }
+    }
+
+    async function adminDeleteItem(itemId) {
+      if (!confirm('Are you sure you want to permanently delete this report as Administrator?')) return;
+      try {
+        await API.items.delete(itemId);
+        showToast('Item removed by admin.', 'info');
+        loadAllAdminData();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete item.', 'danger');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllAdminData();
+
+      // Quick filter
+      document.getElementById('admin-items-search')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = allItemsList.filter(i => 
+          i.title.toLowerCase().includes(q) ||
+          i.location.toLowerCase().includes(q) ||
+          i.category.toLowerCase().includes(q) ||
+          i.reporter_name.toLowerCase().includes(q)
+        );
+        renderAdminItems(filtered);
+      });
+    });
+  </script>
+</body>
+</html>

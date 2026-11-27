@@ -1,0 +1,7 @@
+node_modules/
+campus_lost_found.db
+uploads/*
+!uploads/.gitkeep
+.env
+.DS_Store
+*.log

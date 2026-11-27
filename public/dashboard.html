@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard | Campus Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <div id="navbar-container"></div>
+
+  <main class="py-4">
+    <div class="container">
+      
+      <!-- User Profile Header -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 2rem;">
+                <i class="bi bi-person-badge"></i>
+              </div>
+              <div>
+                <h3 class="fw-bold mb-1" id="dash-user-name">Loading Profile...</h3>
+                <div class="small text-muted d-flex align-items-center gap-2 flex-wrap">
+                  <span id="dash-user-email">...</span>
+                  <span>&bull;</span>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle text-capitalize" id="dash-user-role">Student</span>
+                  <span id="dash-admin-badge" class="badge bg-danger d-none">Administrator</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a href="/report.html?type=LOST" class="btn btn-danger btn-sm px-3 fw-semibold">
+                <i class="bi bi-dash-circle me-1"></i>Report Lost
+              </a>
+              <a href="/report.html?type=FOUND" class="btn btn-success btn-sm px-3 fw-semibold">
+                <i class="bi bi-plus-circle me-1"></i>Report Found
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm border" id="dashboard-tabs" role="tablist">
+        <li class="nav-item flex-fill" role="presentation">
+          <button class="nav-link active w-100 fw-semibold text-center py-2" id="my-reports-tab" data-bs-toggle="pill" data-bs-target="#tab-my-reports" type="button" role="tab">
+            <i class="bi bi-collection me-2"></i>My Reported Items (<span id="count-my-reports">0</span>)
+          </button>
+        </li>
+        <li class="nav-item flex-fill" role="presentation">
+          <button class="nav-link w-100 fw-semibold text-center py-2" id="my-claims-tab" data-bs-toggle="pill" data-bs-target="#tab-my-claims" type="button" role="tab">
+            <i class="bi bi-hand-index-thumb me-2"></i>My Submitted Claims (<span id="count-my-claims">0</span>)
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tabs Content -->
+      <div class="tab-content">
+        
+        <!-- Tab 1: My Reported Items -->
+        <div class="tab-pane fade show active" id="tab-my-reports" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Item</th>
+                      <th>Type</th>
+                      <th>Category</th>
+                      <th>Location</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="my-reports-tbody">
+                    <tr>
+                      <td colspan="7" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading your reports...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: My Submitted Claims -->
+        <div class="tab-pane fade" id="tab-my-claims" role="tabpanel">
+          <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Target Item</th>
+                      <th>Item Type</th>
+                      <th>Campus Location</th>
+                      <th>Proof Submitted</th>
+                      <th>Submitted On</th>
+                      <th>Claim Status</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="my-claims-tbody">
+                    <tr>
+                      <td colspan="7" class="text-center py-4 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading your claims...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let myReports = [];
+    let myClaims = [];
+
+    async function loadDashboard() {
+      try {
+        const authData = await API.auth.me();
+        const user = authData.user;
+
+        document.getElementById('dash-user-name').textContent = user.name;
+        document.getElementById('dash-user-email').textContent = user.email;
+        document.getElementById('dash-user-role').textContent = user.role_type;
+        if (user.is_admin) {
+          document.getElementById('dash-admin-badge').classList.remove('d-none');
+        }
+
+        // Fetch user's reports
+        const itemsRes = await API.items.list({ limit: 100 });
+        myReports = (itemsRes.items || []).filter(item => item.user_id === user.id);
+        document.getElementById('count-my-reports').textContent = myReports.length;
+        renderMyReports(myReports);
+
+        // Fetch user's claims
+        const claimsRes = await API.claims.mine();
+        myClaims = claimsRes.claims || [];
+        document.getElementById('count-my-claims').textContent = myClaims.length;
+        renderMyClaims(myClaims);
+
+      } catch (err) {
+        showToast('Please sign in to access your dashboard.', 'warning');
+        setTimeout(() => {
+          window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }, 600);
+      }
+    }
+
+    function renderMyReports(items) {
+      const tbody = document.getElementById('my-reports-tbody');
+      if (items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+              You haven't reported any lost or found items yet.
+              <div class="mt-3">
+                <a href="/report.html" class="btn btn-sm btn-primary">Report an Item Now</a>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 44px; height: 44px; min-width: 44px;">
+                ${item.image_path 
+                  ? `<img src="${escapeHTML(item.image_path)}" alt="" style="width: 100%; height: 100%; object-fit: cover;">` 
+                  : `<i class="bi ${getCategoryIcon(item.category)} text-secondary fs-5"></i>`}
+              </div>
+              <div>
+                <a href="/item.html?id=${item.id}" class="fw-bold text-dark text-decoration-none">
+                  ${escapeHTML(item.title)}
+                </a>
+              </div>
+            </div>
+          </td>
+          <td>${getTypeBadge(item.type)}</td>
+          <td><span class="small text-secondary">${escapeHTML(item.category)}</span></td>
+          <td><span class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>${escapeHTML(item.location)}</span></td>
+          <td><span class="small text-muted">${formatDate(item.date_event)}</span></td>
+          <td>${getStatusBadge(item.status)}</td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="/item.html?id=${item.id}" class="btn btn-outline-primary" title="View Details">
+                <i class="bi bi-eye"></i>
+              </a>
+              ${item.status !== 'RETURNED' ? `
+              <button class="btn btn-outline-success" onclick="markReturned(${item.id})" title="Mark as Returned">
+                <i class="bi bi-check2-circle"></i>
+              </button>
+              ` : ''}
+              <button class="btn btn-outline-danger" onclick="deleteReport(${item.id})" title="Delete Report">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMyClaims(claims) {
+      const tbody = document.getElementById('my-claims-tbody');
+      if (claims.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-patch-question fs-2 d-block mb-2"></i>
+              You haven't submitted any claims on reported items.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = claims.map(c => `
+        <tr>
+          <td>
+            <a href="/item.html?id=${c.item_id}" class="fw-bold text-dark text-decoration-none">
+              ${escapeHTML(c.item_title)}
+            </a>
+          </td>
+          <td>${getTypeBadge(c.item_type)}</td>
+          <td><span class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>${escapeHTML(c.item_location)}</span></td>
+          <td>
+            <span class="small text-secondary text-truncate d-inline-block" style="max-width: 220px;" title="${escapeHTML(c.proof_message)}">
+              "${escapeHTML(c.proof_message)}"
+            </span>
+          </td>
+          <td><span class="small text-muted">${formatDate(c.claim_date)}</span></td>
+          <td>
+            ${c.claim_status === 'PENDING' ? '<span class="badge bg-warning text-dark">Pending Review</span>' :
+              c.claim_status === 'APPROVED' ? '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>' :
+              '<span class="badge bg-secondary">Rejected</span>'}
+          </td>
+          <td class="text-end">
+            <a href="/item.html?id=${c.item_id}" class="btn btn-sm btn-outline-primary">
+              View Item
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function markReturned(itemId) {
+      if (!confirm('Mark this item as successfully returned?')) return;
+      try {
+        await API.items.update(itemId, { status: 'RETURNED' });
+        showToast('Item marked as RETURNED!', 'success');
+        loadDashboard();
+      } catch (err) {
+        showToast(err.message || 'Action failed.', 'danger');
+      }
+    }
+
+    async function deleteReport(itemId) {
+      if (!confirm('Are you sure you want to permanently delete this report?')) return;
+      try {
+        await API.items.delete(itemId);
+        showToast('Report deleted.', 'info');
+        loadDashboard();
+      } catch (err) {
+        showToast(err.message || 'Failed to delete report.', 'danger');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

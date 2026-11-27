@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse & Search Items | Campus Lost & Found</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <div id="navbar-container"></div>
+
+  <main class="py-4">
+    <div class="container">
+      
+      <!-- Page Header -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+          <h2 class="fw-bold mb-1">Campus Items Directory</h2>
+          <p class="text-muted small mb-0">Search and filter active lost and found reports across campus</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="/report.html?type=LOST" class="btn btn-outline-danger btn-sm px-3 fw-semibold">
+            <i class="bi bi-dash-circle me-1"></i>Report Lost
+          </a>
+          <a href="/report.html?type=FOUND" class="btn btn-outline-success btn-sm px-3 fw-semibold">
+            <i class="bi bi-plus-circle me-1"></i>Report Found
+          </a>
+        </div>
+      </div>
+
+      <!-- Filters & Search Card -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-3 p-md-4">
+          <form id="filter-form">
+            <!-- Keyword Search -->
+            <div class="row g-3 mb-3">
+              <div class="col-lg-8">
+                <div class="input-group">
+                  <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
+                  <input type="text" id="filter-q" class="form-control" placeholder="Search by title, description, or campus building...">
+                </div>
+              </div>
+              <div class="col-lg-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                  <i class="bi bi-funnel me-1"></i>Apply Filters
+                </button>
+                <button type="button" id="reset-filters-btn" class="btn btn-outline-secondary" title="Reset Filters">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Detailed Filters -->
+            <div class="row g-3">
+              <!-- Type -->
+              <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Report Type</label>
+                <select class="form-select form-select-sm" id="filter-type">
+                  <option value="">All Types</option>
+                  <option value="LOST">Lost Items</option>
+                  <option value="FOUND">Found Items</option>
+                </select>
+              </div>
+
+              <!-- Category -->
+              <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Category</label>
+                <select class="form-select form-select-sm" id="filter-category">
+                  <option value="">All Categories</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Wallet/Bags">Wallet & Bags</option>
+                  <option value="ID/Cards">ID & Cards</option>
+                  <option value="Keys">Keys</option>
+                  <option value="Books">Books</option>
+                  <option value="Accessories">Accessories</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- Location -->
+              <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Campus Hub</label>
+                <select class="form-select form-select-sm" id="filter-location">
+                  <option value="">All Locations</option>
+                  <option value="Library">Library</option>
+                  <option value="Canteen">Canteen</option>
+                  <option value="Hostel">Hostel</option>
+                  <option value="Labs">Labs</option>
+                  <option value="Classroom Block">Classroom Block</option>
+                  <option value="Main Gate">Main Gate</option>
+                  <option value="Ground">Ground</option>
+                  <option value="Parking">Parking</option>
+                </select>
+              </div>
+
+              <!-- Status -->
+              <div class="col-6 col-md-3">
+                <label class="form-label small fw-semibold mb-1">Status</label>
+                <select class="form-select form-select-sm" id="filter-status">
+                  <option value="">All Statuses</option>
+                  <option value="OPEN" selected>Active / Open</option>
+                  <option value="CLAIM_PENDING">Claim Pending</option>
+                  <option value="RETURNED">Returned</option>
+                  <option value="CLOSED">Closed</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date Range & Sorting Collapse -->
+            <div class="mt-3 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="small fw-semibold text-muted">Date Range:</span>
+                <input type="date" class="form-control form-control-sm" id="filter-from" style="width: 145px;" title="From Date">
+                <span class="small text-muted">to</span>
+                <input type="date" class="form-control form-control-sm" id="filter-to" style="width: 145px;" title="To Date">
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <span class="small fw-semibold text-muted">Sort:</span>
+                <select class="form-select form-select-sm" id="filter-sort" style="width: 140px;">
+                  <option value="newest" selected>Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Results Count Bar -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="small text-muted" id="results-count-text">
+          Loading items...
+        </div>
+      </div>
+
+      <!-- Items Grid -->
+      <div class="row g-4 mb-4" id="items-grid">
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading items...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <nav aria-label="Items pagination" id="pagination-nav" class="d-none">
+        <ul class="pagination justify-content-center" id="pagination-list"></ul>
+      </nav>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+
+  <script>
+    let currentPage = 1;
+    const limit = 9;
+
+    async function fetchItems(page = 1) {
+      currentPage = page;
+      const grid = document.getElementById('items-grid');
+      const countText = document.getElementById('results-count-text');
+      const pagNav = document.getElementById('pagination-nav');
+
+      grid.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading items...</span>
+          </div>
+        </div>
+      `;
+
+      const params = {
+        page: currentPage,
+        limit,
+        q: document.getElementById('filter-q').value.trim(),
+        type: document.getElementById('filter-type').value,
+        category: document.getElementById('filter-category').value,
+        location: document.getElementById('filter-location').value,
+        status: document.getElementById('filter-status').value,
+        from: document.getElementById('filter-from').value,
+        to: document.getElementById('filter-to').value,
+        sort: document.getElementById('filter-sort').value
+      };
+
+      try {
+        const data = await API.items.list(params);
+        countText.innerHTML = `Showing <strong>${data.items.length}</strong> of <strong>${data.total}</strong> items (Page ${data.page} of ${data.totalPages})`;
+
+        if (!data.items || data.items.length === 0) {
+          grid.innerHTML = `
+            <div class="col-12 text-center py-5">
+              <div class="p-5 bg-white rounded-4 shadow-sm">
+                <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+                <h5 class="fw-bold">No Matching Items Found</h5>
+                <p class="text-muted small mb-3">Try adjusting your filters, keyword search, or campus location.</p>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetFilters()">
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+          `;
+          pagNav.classList.add('d-none');
+          return;
+        }
+
+        grid.innerHTML = data.items.map(item => `
+          <div class="col-md-6 col-lg-4">
+            <div class="item-card">
+              <div class="item-card-img-wrapper">
+                ${item.image_path 
+                  ? `<img src="${escapeHTML(item.image_path)}" alt="${escapeHTML(item.title)}">` 
+                  : `<i class="bi ${getCategoryIcon(item.category)} item-card-placeholder-icon"></i>`}
+                <div class="position-absolute top-0 start-0 m-2">
+                  ${getTypeBadge(item.type)}
+                </div>
+                <div class="position-absolute top-0 end-0 m-2">
+                  ${getStatusBadge(item.status)}
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-1 small text-muted mb-1">
+                  <i class="bi ${getCategoryIcon(item.category)} text-primary"></i>
+                  <span>${escapeHTML(item.category)}</span>
+                  <span>&bull;</span>
+                  <i class="bi bi-geo-alt"></i>
+                  <span class="text-truncate">${escapeHTML(item.location)}</span>
+                </div>
+                <h5 class="item-card-title">${escapeHTML(item.title)}</h5>
+                <p class="item-card-desc">${escapeHTML(item.description)}</p>
+                <div class="item-card-meta d-flex justify-content-between align-items-center pt-2 border-top">
+                  <span><i class="bi bi-calendar3 me-1"></i>${formatDate(item.date_event)}</span>
+                  <a href="/item.html?id=${item.id}" class="btn btn-sm btn-outline-primary fw-medium">
+                    View Details <i class="bi bi-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        renderPagination(data.page, data.totalPages);
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="col-12 text-center py-5 text-danger">
+            ${escapeHTML(err.message || 'Failed to load items.')}
+          </div>
+        `;
+      }
+    }
+
+    function renderPagination(page, totalPages) {
+      const pagNav = document.getElementById('pagination-nav');
+      const pagList = document.getElementById('pagination-list');
+
+      if (totalPages <= 1) {
+        pagNav.classList.add('d-none');
+        return;
+      }
+
+      pagNav.classList.remove('d-none');
+      let html = '';
+
+      // Prev
+      html += `
+        <li class="page-item ${page === 1 ? 'disabled' : ''}">
+          <button class="page-link" onclick="fetchItems(${page - 1})" aria-label="Previous">
+            &laquo;
+          </button>
+        </li>
+      `;
+
+      // Page numbers
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= page - 2 && p <= page + 2)) {
+          html += `
+            <li class="page-item ${p === page ? 'active' : ''}">
+              <button class="page-link" onclick="fetchItems(${p})">${p}</button>
+            </li>
+          `;
+        } else if (p === page - 3 || p === page + 3) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+
+      // Next
+      html += `
+        <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+          <button class="page-link" onclick="fetchItems(${page + 1})" aria-label="Next">
+            &raquo;
+          </button>
+        </li>
+      `;
+
+      pagList.innerHTML = html;
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-form').reset();
+      document.getElementById('filter-status').value = '';
+      fetchItems(1);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Parse URL query params
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('q')) document.getElementById('filter-q').value = urlParams.get('q');
+      if (urlParams.has('type')) document.getElementById('filter-type').value = urlParams.get('type');
+      if (urlParams.has('category')) document.getElementById('filter-category').value = urlParams.get('category');
+      if (urlParams.has('location')) document.getElementById('filter-location').value = urlParams.get('location');
+      if (urlParams.has('status')) document.getElementById('filter-status').value = urlParams.get('status');
+
+      document.getElementById('filter-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchItems(1);
+      });
+
+      document.getElementById('reset-filters-btn').addEventListener('click', resetFilters);
+      document.getElementById('filter-sort').addEventListener('change', () => fetchItems(1));
+
+      fetchItems(1);
+    });
+  </script>
+</body>
+</html>
